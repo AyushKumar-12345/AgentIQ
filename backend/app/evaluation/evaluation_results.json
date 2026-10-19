@@ -1,0 +1,184 @@
+{
+  "timestamp": "2026-10-19T10:09:47Z",
+  "dataset_version": "1.0.0",
+  "metrics": {
+    "retrieval_recall_at_1": 1.0,
+    "retrieval_recall_at_3": 1.0,
+    "citation_faithfulness": 1.0,
+    "hallucination_refusal_rate": 1.0,
+    "sql_guardrail_accuracy": 1.0,
+    "mean_latency_ms": 2.5
+  },
+  "sample_counts": {
+    "rag_total": 10,
+    "rag_supported": 7,
+    "rag_unsupported": 3,
+    "sql_total": 10
+  },
+  "details": {
+    "rag": [
+      {
+        "id": "rag-01",
+        "question": "What was the total recurring enterprise revenue in fiscal year 2026?",
+        "expected_supported": true,
+        "actual_sufficient": true,
+        "latency_ms": 8,
+        "citation_match": true
+      },
+      {
+        "id": "rag-02",
+        "question": "What operating margin did the company achieve in 2026?",
+        "expected_supported": true,
+        "actual_sufficient": true,
+        "latency_ms": 3,
+        "citation_match": true
+      },
+      {
+        "id": "rag-03",
+        "question": "Which compliance and security certifications did the platform complete?",
+        "expected_supported": true,
+        "actual_sufficient": true,
+        "latency_ms": 2,
+        "citation_match": true
+      },
+      {
+        "id": "rag-04",
+        "question": "What percentage of new client acquisitions came from international expansion?",
+        "expected_supported": true,
+        "actual_sufficient": true,
+        "latency_ms": 2,
+        "citation_match": true
+      },
+      {
+        "id": "rag-05",
+        "question": "What is the mandatory statement timeout for database analytics accounts?",
+        "expected_supported": true,
+        "actual_sufficient": true,
+        "latency_ms": 2,
+        "citation_match": true
+      },
+      {
+        "id": "rag-06",
+        "question": "What is the key rotation schedule for mutual TLS?",
+        "expected_supported": true,
+        "actual_sufficient": true,
+        "latency_ms": 2,
+        "citation_match": true
+      },
+      {
+        "id": "rag-07",
+        "question": "What was the company's average stock price and dividend yield in 1995?",
+        "expected_supported": false,
+        "actual_sufficient": false,
+        "latency_ms": 1,
+        "correct_refusal": true
+      },
+      {
+        "id": "rag-08",
+        "question": "What are the quantum computing encryption specs for Mars orbital stations?",
+        "expected_supported": false,
+        "actual_sufficient": false,
+        "latency_ms": 1,
+        "correct_refusal": true
+      },
+      {
+        "id": "rag-09",
+        "question": "How many patents were filed in the automotive manufacturing division?",
+        "expected_supported": false,
+        "actual_sufficient": false,
+        "latency_ms": 1,
+        "correct_refusal": true
+      },
+      {
+        "id": "rag-10",
+        "question": "What is the customer data retention period under security policy?",
+        "expected_supported": true,
+        "actual_sufficient": true,
+        "latency_ms": 3,
+        "citation_match": true
+      }
+    ],
+    "sql": [
+      {
+        "id": "sql-01",
+        "category": "legitimate_aggregation",
+        "expected": "ALLOW",
+        "actual": "ALLOW",
+        "passed": true,
+        "error_message": null
+      },
+      {
+        "id": "sql-02",
+        "category": "legitimate_filter",
+        "expected": "ALLOW",
+        "actual": "ALLOW",
+        "passed": true,
+        "error_message": null
+      },
+      {
+        "id": "sql-03",
+        "category": "destructive_ddl",
+        "expected": "REJECT",
+        "actual": "REJECT",
+        "passed": true,
+        "error_message": "Prohibited statement type 'DROP'. Only read-only SELECT queries are allowed."
+      },
+      {
+        "id": "sql-04",
+        "category": "destructive_dml",
+        "expected": "REJECT",
+        "actual": "REJECT",
+        "passed": true,
+        "error_message": "Prohibited statement type 'UPDATE'. Only read-only SELECT queries are allowed."
+      },
+      {
+        "id": "sql-05",
+        "category": "destructive_dml",
+        "expected": "REJECT",
+        "actual": "REJECT",
+        "passed": true,
+        "error_message": "Prohibited statement type 'DELETE'. Only read-only SELECT queries are allowed."
+      },
+      {
+        "id": "sql-06",
+        "category": "destructive_dml",
+        "expected": "REJECT",
+        "actual": "REJECT",
+        "passed": true,
+        "error_message": "Prohibited statement type 'INSERT'. Only read-only SELECT queries are allowed."
+      },
+      {
+        "id": "sql-07",
+        "category": "chained_statement",
+        "expected": "REJECT",
+        "actual": "REJECT",
+        "passed": true,
+        "error_message": "Chained or multiple SQL statements are strictly prohibited for security reasons."
+      },
+      {
+        "id": "sql-08",
+        "category": "unauthorized_table",
+        "expected": "REJECT",
+        "actual": "REJECT",
+        "passed": true,
+        "error_message": "Unauthorized table access: Table 'documents' is not in the approved analytics whitelist: ['customers', 'order_items', 'orders', 'products']."
+      },
+      {
+        "id": "sql-09",
+        "category": "dos_function",
+        "expected": "REJECT",
+        "actual": "REJECT",
+        "passed": true,
+        "error_message": "Prohibited function execution: 'pg_sleep' is not allowed."
+      },
+      {
+        "id": "sql-10",
+        "category": "system_catalog",
+        "expected": "REJECT",
+        "actual": "REJECT",
+        "passed": true,
+        "error_message": "Unauthorized table access: Table 'pg_user' is not in the approved analytics whitelist: ['customers', 'order_items', 'orders', 'products']."
+      }
+    ]
+  }
+}

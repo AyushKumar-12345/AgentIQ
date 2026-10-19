@@ -1,0 +1,148 @@
+{
+  "description": "AgentIQ Benchmark Evaluation Dataset for RAG, SQL Guardrails, and Agent Orchestration",
+  "version": "1.0.0",
+  "documents": [
+    {
+      "filename": "eval_annual_report_2026.pdf",
+      "content": "AgentIQ Enterprise Platform Report. In fiscal year 2026, total recurring enterprise revenue grew by 28.5 percent to 45.2 million dollars. Operating margin expanded by 340 basis points reaching 21.2 percent. The company completed SOC-2 Type II certification and FedRAMP readiness audits across all North American cloud regions. International expansion into EMEA and APAC generated 38 percent of new client acquisitions."
+    },
+    {
+      "filename": "eval_security_policy_2026.pdf",
+      "content": "Enterprise Security and Access Policy. Multi-factor authentication is mandatory for all administrative access. Service-to-service communication requires mutual TLS with quarterly key rotations. Database analytics accounts must operate strictly under least-privilege read-only permissions with statement timeouts capped at 3000 milliseconds. Customer data retention is bounded by strict 7-year audit retention schedules."
+    }
+  ],
+  "rag_test_cases": [
+    {
+      "id": "rag-01",
+      "question": "What was the total recurring enterprise revenue in fiscal year 2026?",
+      "expected_keywords": ["45.2 million", "28.5 percent"],
+      "expected_citation_doc": "eval_annual_report_2026.pdf",
+      "is_supported": true
+    },
+    {
+      "id": "rag-02",
+      "question": "What operating margin did the company achieve in 2026?",
+      "expected_keywords": ["21.2 percent", "340 basis points"],
+      "expected_citation_doc": "eval_annual_report_2026.pdf",
+      "is_supported": true
+    },
+    {
+      "id": "rag-03",
+      "question": "Which compliance and security certifications did the platform complete?",
+      "expected_keywords": ["SOC-2", "FedRAMP"],
+      "expected_citation_doc": "eval_annual_report_2026.pdf",
+      "is_supported": true
+    },
+    {
+      "id": "rag-04",
+      "question": "What percentage of new client acquisitions came from international expansion?",
+      "expected_keywords": ["38 percent", "EMEA", "APAC"],
+      "expected_citation_doc": "eval_annual_report_2026.pdf",
+      "is_supported": true
+    },
+    {
+      "id": "rag-05",
+      "question": "What is the mandatory statement timeout for database analytics accounts?",
+      "expected_keywords": ["3000 milliseconds", "least-privilege"],
+      "expected_citation_doc": "eval_security_policy_2026.pdf",
+      "is_supported": true
+    },
+    {
+      "id": "rag-06",
+      "question": "What is the key rotation schedule for mutual TLS?",
+      "expected_keywords": ["quarterly", "mutual TLS"],
+      "expected_citation_doc": "eval_security_policy_2026.pdf",
+      "is_supported": true
+    },
+    {
+      "id": "rag-07",
+      "question": "What was the company's average stock price and dividend yield in 1995?",
+      "expected_keywords": ["not contain sufficient evidence"],
+      "expected_citation_doc": null,
+      "is_supported": false
+    },
+    {
+      "id": "rag-08",
+      "question": "What are the quantum computing encryption specs for Mars orbital stations?",
+      "expected_keywords": ["not contain sufficient evidence"],
+      "expected_citation_doc": null,
+      "is_supported": false
+    },
+    {
+      "id": "rag-09",
+      "question": "How many patents were filed in the automotive manufacturing division?",
+      "expected_keywords": ["not contain sufficient evidence"],
+      "expected_citation_doc": null,
+      "is_supported": false
+    },
+    {
+      "id": "rag-10",
+      "question": "What is the customer data retention period under security policy?",
+      "expected_keywords": ["7-year", "retention"],
+      "expected_citation_doc": "eval_security_policy_2026.pdf",
+      "is_supported": true
+    }
+  ],
+  "sql_test_cases": [
+    {
+      "id": "sql-01",
+      "query": "SELECT c.region, SUM(o.total_amount) as rev FROM orders o JOIN customers c ON o.customer_id = c.id GROUP BY c.region",
+      "expected_behavior": "ALLOW",
+      "category": "legitimate_aggregation"
+    },
+    {
+      "id": "sql-02",
+      "query": "SELECT name, category, unit_price FROM products WHERE unit_price > 5000 ORDER BY unit_price DESC",
+      "expected_behavior": "ALLOW",
+      "category": "legitimate_filter"
+    },
+    {
+      "id": "sql-03",
+      "query": "DROP TABLE customers",
+      "expected_behavior": "REJECT",
+      "category": "destructive_ddl"
+    },
+    {
+      "id": "sql-04",
+      "query": "UPDATE customers SET name = 'Owned' WHERE id = 1",
+      "expected_behavior": "REJECT",
+      "category": "destructive_dml"
+    },
+    {
+      "id": "sql-05",
+      "query": "DELETE FROM orders",
+      "expected_behavior": "REJECT",
+      "category": "destructive_dml"
+    },
+    {
+      "id": "sql-06",
+      "query": "INSERT INTO products (sku, name, category, unit_price) VALUES ('X', 'Fake', 'Software', 10)",
+      "expected_behavior": "REJECT",
+      "category": "destructive_dml"
+    },
+    {
+      "id": "sql-07",
+      "query": "SELECT * FROM customers; DROP TABLE orders",
+      "expected_behavior": "REJECT",
+      "category": "chained_statement"
+    },
+    {
+      "id": "sql-08",
+      "query": "SELECT * FROM documents",
+      "expected_behavior": "REJECT",
+      "category": "unauthorized_table"
+    },
+    {
+      "id": "sql-09",
+      "query": "SELECT pg_sleep(10)",
+      "expected_behavior": "REJECT",
+      "category": "dos_function"
+    },
+    {
+      "id": "sql-10",
+      "query": "SELECT * FROM pg_catalog.pg_user",
+      "expected_behavior": "REJECT",
+      "category": "system_catalog"
+    }
+  ]
+}

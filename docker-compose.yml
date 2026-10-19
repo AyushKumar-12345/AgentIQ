@@ -1,0 +1,56 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: agentiq-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: agentiq_db
+      POSTGRES_USER: agentiq_user
+      POSTGRES_PASSWORD: agentiq_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./docker/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U agentiq_user -d agentiq_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: agentiq-backend
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql+psycopg://agentiq_user:agentiq_password@postgres:5432/agentiq_db
+      - ANALYTICS_DATABASE_URL=postgresql+psycopg://analytics_reader:readonly_password@postgres:5432/agentiq_db
+      - ENVIRONMENT=production
+      - BACKEND_HOST=0.0.0.0
+      - BACKEND_PORT=8000
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - uploads_data:/app/uploads
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: agentiq-frontend
+    restart: unless-stopped
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:
+  uploads_data:
