@@ -1,57 +1,74 @@
 version: '3.8'
 
 services:
-  postgres:
+  # 1. PostgreSQL 16 with pgvector extension
+  db:
     image: pgvector/pgvector:pg16
-    container_name: agentiq-postgres
+    container_name: agentiq-db
     restart: unless-stopped
     environment:
-      POSTGRES_DB: agentiq_db
-      POSTGRES_USER: agentiq_user
-      POSTGRES_PASSWORD: agentiq_password
+      POSTGRES_DB: agentiq
+      POSTGRES_USER: agentiq
+      POSTGRES_PASSWORD: agentiq_secure_pass
     ports:
       - "5432:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
-      - ./docker/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql:ro
+      - pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U agentiq_user -d agentiq_db"]
-      interval: 5s
+      test: ["CMD-SHELL", "pg_isready -U agentiq -d agentiq"]
+      interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - agentiq-network
 
+  # 2. AgentIQ FastAPI Backend
   backend:
     build:
-      context: ./backend
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: backend/Dockerfile
     container_name: agentiq-backend
     restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://agentiq:agentiq_secure_pass@db:5432/agentiq
+      ANALYTICS_DATABASE_URL: postgresql://agentiq:agentiq_secure_pass@db:5432/agentiq
+      LLM_PROVIDER: ${LLM_PROVIDER:-mock}
+      EMBEDDING_PROVIDER: ${EMBEDDING_PROVIDER:-mock}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      ENVIRONMENT: production
+      LOG_LEVEL: INFO
+      ALLOWED_ORIGINS: "http://localhost:5173,http://localhost:80,http://127.0.0.1:5173,http://localhost:3000"
     ports:
       - "8000:8000"
-    environment:
-      - DATABASE_URL=postgresql+psycopg://agentiq_user:agentiq_password@postgres:5432/agentiq_db
-      - ANALYTICS_DATABASE_URL=postgresql+psycopg://analytics_reader:readonly_password@postgres:5432/agentiq_db
-      - ENVIRONMENT=production
-      - BACKEND_HOST=0.0.0.0
-      - BACKEND_PORT=8000
-    depends_on:
-      postgres:
-        condition: service_healthy
     volumes:
-      - uploads_data:/app/uploads
+      - backend_uploads:/app/uploads
+    networks:
+      - agentiq-network
 
+  # 3. AgentIQ React Frontend (Nginx SPA + Reverse Proxy)
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
     container_name: agentiq-frontend
     restart: unless-stopped
-    ports:
-      - "5173:80"
     depends_on:
       - backend
+    ports:
+      - "5173:80"
+    networks:
+      - agentiq-network
 
 volumes:
-  postgres_data:
-  uploads_data:
+  pgdata:
+    driver: local
+  backend_uploads:
+    driver: local
 
+networks:
+  agentiq-network:
+    driver: bridge

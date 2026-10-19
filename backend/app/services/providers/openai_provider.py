@@ -11,8 +11,10 @@ class OpenAIProvider(BaseLLMProvider, BaseEmbeddingProvider):
     """OpenAI API Provider for Chat and Embeddings."""
 
     def __init__(self):
-        if not settings.OPENAI_API_KEY:
-            raise AgentIQException("OPENAI_API_KEY is not configured in environment.")
+        if not settings.OPENAI_API_KEY or not settings.OPENAI_API_KEY.strip():
+            raise AgentIQException(
+                "OpenAI API key is missing. Set OPENAI_API_KEY in your .env file, or set LLM_PROVIDER=mock for offline development."
+            )
         self.api_key = settings.OPENAI_API_KEY
         self.chat_model = settings.OPENAI_CHAT_MODEL
         self.embedding_model = settings.OPENAI_EMBEDDING_MODEL

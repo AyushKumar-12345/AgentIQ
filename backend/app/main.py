@@ -22,7 +22,27 @@ async def lifespan(app: FastAPI):
     # Ensure upload directory exists
     os.makedirs(settings.UPLOAD_DIR, exist_ok=True)
     logger.info(f"Verified upload storage at: {settings.UPLOAD_DIR}")
-    
+
+    # Ensure database schemas and seed data exist
+    try:
+        from app.db.session import engine, Base, SessionLocal
+        from app.db.seed_business_data import seed_business_data
+        from sqlalchemy import text
+
+        if engine.dialect.name == "postgresql":
+            with engine.connect() as conn:
+                conn.execute(text("CREATE EXTENSION IF NOT EXISTS vector;"))
+                conn.commit()
+
+        Base.metadata.create_all(bind=engine)
+
+        with SessionLocal() as db:
+            seed_business_data(db)
+
+        logger.info("Database schemas and initial seed data verified.")
+    except Exception as exc:
+        logger.warning(f"Database initialization check notice: {exc}")
+
     yield
     
     logger.info(f"Shutting down {settings.PROJECT_NAME}")

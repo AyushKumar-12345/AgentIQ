@@ -14,7 +14,7 @@ def test_root_endpoint(client):
 
 
 def test_health_check_endpoint(client):
-    """Verifies that the health check endpoint reports service status."""
+    """Verifies that the health check endpoint reports service status and provider details."""
     response = client.get("/api/v1/health")
     assert response.status_code == status.HTTP_200_OK
     data = response.json()
@@ -23,4 +23,7 @@ def test_health_check_endpoint(client):
     assert "database" in data
     assert "details" in data
     assert data["details"]["llm_provider"] == "mock"
+    assert data["details"]["is_mock"] is True
+    assert "active_model" in data["details"]
+
 

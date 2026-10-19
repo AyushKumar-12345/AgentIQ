@@ -11,8 +11,10 @@ class GeminiProvider(BaseLLMProvider, BaseEmbeddingProvider):
     """Google Gemini Provider using standard REST endpoints."""
 
     def __init__(self):
-        if not settings.GEMINI_API_KEY:
-            raise AgentIQException("GEMINI_API_KEY is not configured in environment.")
+        if not settings.GEMINI_API_KEY or not settings.GEMINI_API_KEY.strip():
+            raise AgentIQException(
+                "Google Gemini API key is missing. Set GEMINI_API_KEY in your .env file, or set LLM_PROVIDER=mock for offline development."
+            )
         self.api_key = settings.GEMINI_API_KEY
         self.chat_model = settings.GEMINI_CHAT_MODEL
         self.embedding_model = settings.GEMINI_EMBEDDING_MODEL

@@ -1,126 +1,191 @@
 # AgentIQ — Agentic Enterprise Knowledge Assistant
 
-AgentIQ is a full-stack, enterprise-grade AI knowledge platform. It enables organizations to upload business documents, retrieve grounded factual answers with verifiable citations, and query relational business metrics through safe, bounded agentic workflows powered by LangGraph, PostgreSQL, and pgvector.
+AgentIQ is a full-stack, enterprise-grade AI knowledge platform. It enables organizations to ingest business documents, retrieve grounded factual answers with verifiable source citations, and query relational business metrics through safe, bounded agentic workflows powered by LangGraph, PostgreSQL, and pgvector.
 
 ---
 
 ## 1. Architectural Highlights
 
-- **Backend:** FastAPI with Pydantic v2 schemas, SQLAlchemy 2.x ORM, Alembic migrations, and structured logging.
-- **Frontend:** React 18, TypeScript (strict mode), Vite, Tailwind CSS, Lucide icons.
-- **Vector & Relational Storage:** PostgreSQL 16 + pgvector for dense vector similarity search (1536d / 768d vectors) alongside relational business data.
-- **Agent Orchestration:** LangGraph StateGraph with bounded execution limits ($N \le 4$ steps), execution timeouts, and strict schema validation.
-- **Safe SQL Analytics Tool:** 5-layer security model: AST validation via `sqlglot`, statement limits, table whitelist, execution timeouts, and a dedicated read-only database role (`analytics_reader`).
-- **Grounded RAG:** Ingestion with SHA-256 deduplication, recursive character chunking, cosine similarity retrieval, strict grounding prompts, and automated citation mapping.
+- **Frontend:** React 18, TypeScript (strict type checking), Vite, Tailwind CSS, Lucide icons, responsive three-part workspace.
+- **UI Design System:** Pure white (`#FFFFFF`) background, deep black (`#000000`) primary typography, dark gray secondary accents, restrained borders, and minimal green indicators reserved solely for active health states.
+- **Backend:** Python 3.12, FastAPI, Pydantic v2 schemas, SQLAlchemy 2.x ORM, Alembic migrations, structured logging.
+- **Vector & Relational Storage:** PostgreSQL 16 with `pgvector` for dense vector similarity search (1536d / 768d vectors) alongside relational business tables.
+- **Agent Orchestration:** LangGraph `StateGraph` workflow bounded to $N \le 4$ steps, deterministic fallback paths, execution timeouts, and strict schema validation.
+- **Safe SQL Analytics Tool:** 5-defense security model featuring AST parsing via `sqlglot` (permitting single-statement `SELECT` on whitelisted tables), automatic `LIMIT 50` clamping, query timeout bounds, and a dedicated `analytics_reader` role.
+- **Grounded RAG Pipeline:** PDF text extraction with magic-byte validation (`%PDF-`), SHA-256 deduplication, recursive character chunking (500 chars, 100 overlap), cosine similarity cutoff, and citation mapping (`[Doc: <name>, Page: <p>]`).
+- **Provider Abstraction:** Configurable AI provider layer supporting deterministic offline `mock` mode (for automated testing and evaluation), `openai` (`gpt-4o-mini`), and `gemini` (`gemini-1.5-flash`).
+- **Containerization & CI/CD:** Production Dockerfiles (non-root backend, multi-stage Nginx frontend with reverse proxy), `docker-compose.yml`, and GitHub Actions CI workflow covering linting, pytest, vitest, and Docker build verification.
 
 ---
 
-## 2. Directory Layout
+## 2. Workspace Layout
 
 ```
 AgentIQ/
-├── .github/workflows/ci.yml       # GitHub Actions CI for linting, tests, and build
-├── docker/init-db.sql             # Postgres init script (pgvector + analytics_reader role)
-├── docker-compose.yml             # Postgres+pgvector, Backend, Frontend
-├── .env.example                   # Configuration template
-├── pytest.ini                     # Pytest runner configuration
+├── .github/
+│   └── workflows/
+│       └── ci.yml             # GitHub Actions CI (lint, pytest, vitest, docker build)
 ├── backend/
-│   ├── Dockerfile
-│   ├── requirements.txt
-│   ├── alembic.ini
-│   ├── alembic/                   # Database migrations
+│   ├── Dockerfile             # Python 3.12 slim, non-root user, healthcheck
+│   ├── .dockerignore
+│   ├── requirements.txt       # Pinned production dependencies
+│   ├── alembic.ini            # Alembic database migration config
+│   ├── alembic/               # Database version revisions
 │   └── app/
-│       ├── main.py                # FastAPI entrypoint
-│       ├── config.py              # Pydantic BaseSettings
-│       ├── core/                  # Logging, exceptions, security
-│       ├── db/                    # SQLAlchemy engine & session
-│       ├── models/                # ORM models (documents, chunks, business)
-│       ├── schemas/               # Pydantic validation schemas
-│       ├── services/              # Ingestion, RAG, SQL tool, providers
-│       ├── agent/                 # LangGraph workflows and tools
-│       ├── api/                   # REST API routes (v1)
-│       └── evaluation/            # Automated evaluation suite
+│       ├── main.py            # FastAPI application entrypoint & lifespan
+│       ├── config.py          # Pydantic BaseSettings environment validation
+│       ├── core/              # Logging, exceptions, error handlers
+│       ├── db/                # Engine, sessions, seeders
+│       ├── models/            # SQLAlchemy models (Document, Chunk, Customer, Order)
+│       ├── schemas/           # Pydantic validation schemas
+│       ├── services/          # Ingestion, RAG, SQL guardrail, providers
+│       ├── agent/             # LangGraph state graph, router, and tools
+│       ├── api/               # REST API endpoints (v1)
+│       └── evaluation/        # Evaluation benchmark suite & test dataset
 ├── frontend/
-│   ├── Dockerfile
+│   ├── Dockerfile             # Multi-stage build (Node 22 -> Nginx Alpine)
+│   ├── nginx.conf             # Nginx reverse proxy configuration
+│   ├── .dockerignore
 │   ├── package.json
-│   ├── vite.config.ts
-│   └── src/                       # React components, hooks, and types
-└── tests/
-    ├── conftest.py
-    ├── unit/
-    ├── integration/
-    └── security/
+│   ├── vite.config.ts         # Vite bundler & Vitest test config
+│   └── src/
+│       ├── App.tsx            # Three-part enterprise layout & state
+│       ├── components/
+│       │   ├── chat/          # AgenticChat & Collapsible Information Inspector
+│       │   ├── documents/     # DocumentVault with KPI metrics & drag-and-drop
+│       │   └── analytics/     # SQLAnalyticsView (presets, custom editor, schema)
+│       ├── api/               # Typed client fetchers
+│       └── types/             # TypeScript shared interfaces
+├── tests/
+│   ├── conftest.py            # SQLite/PostgreSQL fixtures & client session
+│   ├── unit/                  # Chunking, PDF extraction, guardrails, providers
+│   ├── integration/           # Health, Documents, Chat, LangGraph workflows
+│   └── security/              # SQL injection and AST parser boundary tests
+├── docker-compose.yml         # Multi-service compose (pgvector, backend, frontend)
+├── run_backend.py             # Zero-config root backend launcher
+├── start.ps1                  # PowerShell 1-click startup script
+├── start.bat                  # Windows batch 1-click startup script
+└── pytest.ini                 # Pytest runner configuration
 ```
 
 ---
 
-## 3. Quickstart & Local Setup
+## 3. Quickstart & Running AgentIQ
 
-### 3.1 Prerequisites
-- Python 3.12+
-- Node.js 20+ and npm 10+
-- Docker & Docker Compose (optional for containerized setup)
+### Option A: 1-Click Launch (Recommended for Windows)
 
-### 3.2 Environment Setup
-1. Copy the environment configuration template:
-   ```bash
-   cp .env.example .env
-   ```
-2. Configure your desired LLM and embedding providers in `.env` (defaults to `mock` for local, cost-free testing).
+In your PowerShell terminal:
+```powershell
+.\start.ps1
+```
+*(Or double-click `start.bat` in Windows File Explorer).*
 
-### 3.3 Running Locally (Bare Metal)
+This script automatically launches the FastAPI backend on port 8000, the Vite React frontend on port 5173, and opens your browser.
 
-#### Backend:
+---
+
+### Option B: Dual-Terminal Workflow (Developer Setup)
+
+#### Terminal 1 — Backend (FastAPI):
 ```bash
-# 1. Create and activate virtual environment
-python -m venv .venv
-.\.venv\Scripts\Activate.ps1    # Windows PowerShell
+# Activate your virtual environment
+.\.venv\Scripts\Activate.ps1    # Windows
 # source .venv/bin/activate     # macOS/Linux
 
-# 2. Install dependencies
-pip install -r backend/requirements.txt
-
-# 3. Start development server
-uvicorn app.main:app --app-dir backend --reload --port 8000
+# Launch backend runner
+python run_backend.py
 ```
-- Interactive API Docs: `http://localhost:8000/docs`
-- Health Check: `http://localhost:8000/api/v1/health`
+- API Server: `http://localhost:8000`
+- Interactive Swagger API Docs: `http://localhost:8000/docs`
+- Health Endpoint: `http://localhost:8000/api/v1/health`
 
-#### Frontend:
+#### Terminal 2 — Frontend (React + Vite):
 ```bash
-cd frontend
-npm install
 npm run dev
 ```
-- Frontend UI: `http://localhost:5173`
-
-### 3.4 Running with Docker Compose
-```bash
-docker compose up --build -d
-```
-- Frontend: `http://localhost:5173`
-- Backend API: `http://localhost:8000`
-- PostgreSQL pgvector: `localhost:5432`
+- Web Application: `http://localhost:5173`
 
 ---
 
-## 4. Testing & Verification Commands
+### Option C: Containerized with Docker Compose
+
+Ensure Docker and Docker Compose are installed:
+```bash
+# Build and launch all services in detached mode
+docker compose up --build -d
+
+# Check service logs
+docker compose logs -f
+
+# Verify running containers
+docker compose ps
+
+# Teardown services
+docker compose down
+```
+
+- Web UI (Nginx SPA): `http://localhost:5173`
+- Backend REST API: `http://localhost:8000`
+- PostgreSQL + pgvector: `localhost:5432`
+
+---
+
+## 4. AI Provider Configuration
+
+AgentIQ supports both offline deterministic development (zero cost) and live production LLM providers via environment variables in `.env`:
+
+| Provider | `LLM_PROVIDER` | `EMBEDDING_PROVIDER` | Required Environment Variables |
+|---|---|---|---|
+| **Mock (Default)** | `mock` | `mock` | None (Deterministic hashing & grounded prompt citations) |
+| **OpenAI** | `openai` | `openai` | `OPENAI_API_KEY=sk-...`<br>`OPENAI_CHAT_MODEL=gpt-4o-mini`<br>`OPENAI_EMBEDDING_MODEL=text-embedding-3-small` |
+| **Google Gemini** | `gemini` | `gemini` | `GEMINI_API_KEY=AIza...`<br>`GEMINI_CHAT_MODEL=gemini-1.5-flash`<br>`GEMINI_EMBEDDING_MODEL=models/text-embedding-004` |
+
+> [!NOTE]
+> When `LLM_PROVIDER=openai` or `gemini` is selected without a valid API key, AgentIQ raises an explicit, user-friendly exception preventing silent fallback or simulated responses.
+
+---
+
+## 5. Automated Verification & Testing
+
+Every layer of the application is covered by unit, integration, and security tests:
 
 ```bash
-# 1. Run all backend unit and integration tests
+# 1. Run full backend test suite (43 passed)
 pytest -v
 
-# 2. Run Ruff linter on backend
-ruff check backend
+# 2. Run backend linter (Ruff)
+ruff check backend tests
 
-# 3. Run frontend TypeScript type checking and production build
-cd frontend && npm run build
+# 3. Run frontend unit tests (Vitest)
+npm test --prefix frontend
+
+# 4. Run frontend TypeScript check & production bundle
+npm run build
 ```
+
+### Test Suite Coverage Breakdown
+
+- **Unit Tests:** `test_chunking.py`, `test_pdf_extraction.py`, `test_sql_guardrails.py`, `test_providers.py`
+- **Integration Tests:** `test_api_health.py`, `test_api_documents.py`, `test_api_chat.py`, `test_agent_graph.py`
+- **Security & Injection:** `test_sql_injection.py` (prohibits chained queries, schema alterations, SQL drops, and table traversal)
+- **Frontend Tests:** `App.test.tsx` (verifies three-part workspace, brand identity, navigation items, and system health status)
 
 ---
 
-## 5. Security & Least-Privilege Architecture
+## 6. Security Boundaries & Guardrails
 
-- **PDF Ingestion:** File magic byte inspection (`%PDF-`), 15MB size limit, SHA-256 hash deduplication.
-- **SQL Analytics:** The agent interacts with business data solely through the `analytics_reader` role, restricted strictly to `SELECT` on authorized business tables (`customers`, `orders`, `order_items`, `products`). Any DDL, DML, or application metadata queries are blocked by both AST parsing and the database engine.
+1. **Document Upload Protection:** Inspects `%PDF-` file magic bytes, enforces a 15 MB payload limit, and uses SHA-256 file hashing for deduplication.
+2. **Safe SQL Analytics AST Parsing:** Powered by `sqlglot`, queries are strictly parsed into Abstract Syntax Trees. Chained statements (`SELECT ...; DROP ...`), DDL, DML, and blacklisted functions (`pg_sleep`) are rejected before reaching the database.
+3. **Automatic Query Clamping:** All analytical `SELECT` statements are clamped to `LIMIT 50` rows with a 3,000ms execution timeout.
+4. **Least-Privilege Database Role:** The database connection for business analytics runs under `analytics_reader`, restricted solely to `SELECT` privileges on approved tables (`customers`, `products`, `orders`, `order_items`).
+5. **Grounded Synthesis:** The RAG pipeline requires cosine similarity $> 0.45$. When evidence is insufficient, AgentIQ returns an explicit lack-of-evidence notification instead of hallucinating.
 
+---
+
+## 7. GitHub Actions CI/CD
+
+The workflow in `.github/workflows/ci.yml` triggers on pushes and pull requests to `main`, `master`, and `develop`:
+
+1. **Backend Checks:** Spins up an ephemeral `pgvector/pgvector:pg16` service container, installs dependencies, executes `ruff check`, and runs all 43 pytest tests.
+2. **Frontend Checks:** Sets up Node.js 22, installs dependencies via `npm ci`, runs Vitest unit tests, and verifies the TypeScript production bundle (`npm run build`).
+3. **Docker Verification:** Uses `docker/setup-buildx-action` to build both `backend/Dockerfile` and `frontend/Dockerfile` images, guaranteeing container build readiness.

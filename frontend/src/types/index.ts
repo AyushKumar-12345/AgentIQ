@@ -8,6 +8,10 @@ export interface HealthData {
   details?: {
     llm_provider: string;
     embedding_provider: string;
+    active_model?: string;
+    is_mock?: boolean;
+    openai_configured?: boolean;
+    gemini_configured?: boolean;
     chunk_size: number;
     chunk_overlap: number;
   };

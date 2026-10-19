@@ -20,6 +20,12 @@ def get_health() -> HealthCheckResponse:
     db_status = "connected" if db_healthy else "disconnected"
     overall_status = "healthy" if db_healthy else "degraded"
 
+    active_model = "mock-deterministic"
+    if settings.LLM_PROVIDER == "openai":
+        active_model = settings.OPENAI_CHAT_MODEL
+    elif settings.LLM_PROVIDER == "gemini":
+        active_model = settings.GEMINI_CHAT_MODEL
+
     return HealthCheckResponse(
         status=overall_status,
         version=settings.VERSION,
@@ -28,8 +34,13 @@ def get_health() -> HealthCheckResponse:
         details={
             "llm_provider": settings.LLM_PROVIDER,
             "embedding_provider": settings.EMBEDDING_PROVIDER,
+            "active_model": active_model,
+            "is_mock": settings.LLM_PROVIDER == "mock",
+            "openai_configured": bool(settings.OPENAI_API_KEY.strip()),
+            "gemini_configured": bool(settings.GEMINI_API_KEY.strip()),
             "chunk_size": settings.CHUNK_SIZE,
             "chunk_overlap": settings.CHUNK_OVERLAP,
         },
     )
+
 
