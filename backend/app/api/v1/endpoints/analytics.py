@@ -81,3 +81,4 @@ def get_allowed_schema() -> Dict[str, Any]:
             "Executed with least-privilege analytics_reader role",
         ],
     }
+

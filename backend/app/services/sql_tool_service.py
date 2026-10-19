@@ -185,3 +185,4 @@ class SQLToolService:
         except Exception as db_err:
             logger.error(f"SQL execution error: {str(db_err)}")
             raise SQLSecurityViolationError(f"Database query error: {str(db_err)}")
+

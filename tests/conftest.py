@@ -92,3 +92,4 @@ def make_sample_pdf():
         return header + obj1 + obj2 + obj3 + obj4 + obj5 + xref + trailer
 
     return _generator
+

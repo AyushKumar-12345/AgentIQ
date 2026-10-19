@@ -77,3 +77,4 @@ jobs:
       - name: Run TypeScript Type Check & Vite Build
         working-directory: ./frontend
         run: npm run build
+

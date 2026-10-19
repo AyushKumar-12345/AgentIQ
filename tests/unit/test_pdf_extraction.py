@@ -40,3 +40,4 @@ def test_malformed_pdf_handling():
     corrupt_bytes = b"%PDF-1.4\nCorrupted binary garbage that cannot be parsed %%EOF"
     with pytest.raises(DocumentProcessingError, match="Corrupted or malformed PDF file"):
         PDFExtractor.extract_pages(corrupt_bytes)
+

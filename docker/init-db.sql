@@ -26,3 +26,4 @@ GRANT USAGE ON SCHEMA public TO analytics_reader;
 
 -- Grant SELECT only on the approved sample business tables (created during migrations/seed)
 ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT ON TABLES TO analytics_reader;
+

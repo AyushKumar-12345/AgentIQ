@@ -71,79 +71,81 @@ export default function SQLAnalyticsView() {
   return (
     <div className="max-w-6xl mx-auto space-y-6">
       {/* Header and Security Banner */}
-      <div className="border border-slate-800 rounded-2xl bg-slate-900/40 p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-        <div className="space-y-1">
-          <div className="flex items-center gap-2 text-white font-semibold text-lg">
-            <Database className="w-5 h-5 text-emerald-400" />
+      <div className="border border-slate-200 rounded-2xl bg-white p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-xs">
+        <div className="space-y-1.5">
+          <div className="flex items-center gap-2.5 text-black font-bold text-lg tracking-tight">
+            <div className="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center text-emerald-700">
+              <Database className="w-4 h-4" />
+            </div>
             <h3>Restricted SQL Business Analytics</h3>
           </div>
-          <p className="text-xs text-slate-400 max-w-xl">
+          <p className="text-xs text-slate-600 max-w-xl font-normal leading-relaxed">
             Query synthetic enterprise business tables (customers, products, orders, order_items) under strict AST validation, automated LIMIT enforcement, and dedicated read-only database credentials.
           </p>
         </div>
 
-        <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-xs">
-          <ShieldCheck className="w-4 h-4 text-emerald-400" />
-          <span className="text-slate-300">Role: <strong className="text-emerald-400 font-mono">analytics_reader</strong></span>
+        <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-xs shadow-2xs">
+          <ShieldCheck className="w-4 h-4 text-emerald-600" />
+          <span className="text-slate-700 font-medium">Role: <strong className="text-black font-bold font-mono">analytics_reader</strong></span>
         </div>
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-2 border-b border-slate-800 pb-2">
+      <div className="flex gap-2 border-b border-slate-200 pb-2">
         <button
           onClick={() => setActiveTab('presets')}
-          className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold transition-colors ${
+          className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
             activeTab === 'presets'
-              ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
-              : 'text-slate-400 hover:text-white hover:bg-slate-800/40'
+              ? 'bg-emerald-50 text-emerald-900 border border-emerald-200 shadow-2xs'
+              : 'text-slate-600 hover:text-black hover:bg-slate-100'
           }`}
         >
-          <TableIcon className="w-3.5 h-3.5" />
-          Predefined Analytical Queries
+          <TableIcon className="w-3.5 h-3.5 text-emerald-600" />
+          <span>Predefined Analytical Queries</span>
         </button>
         <button
           onClick={() => setActiveTab('custom')}
-          className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold transition-colors ${
+          className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
             activeTab === 'custom'
-              ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
-              : 'text-slate-400 hover:text-white hover:bg-slate-800/40'
+              ? 'bg-emerald-50 text-emerald-900 border border-emerald-200 shadow-2xs'
+              : 'text-slate-600 hover:text-black hover:bg-slate-100'
           }`}
         >
-          <Terminal className="w-3.5 h-3.5" />
-          Custom SQL Editor
+          <Terminal className="w-3.5 h-3.5 text-emerald-600" />
+          <span>Custom SQL Editor</span>
         </button>
         <button
           onClick={() => setActiveTab('schema')}
-          className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold transition-colors ${
+          className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
             activeTab === 'schema'
-              ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
-              : 'text-slate-400 hover:text-white hover:bg-slate-800/40'
+              ? 'bg-emerald-50 text-emerald-900 border border-emerald-200 shadow-2xs'
+              : 'text-slate-600 hover:text-black hover:bg-slate-100'
           }`}
         >
-          <HelpCircle className="w-3.5 h-3.5" />
-          Approved Schema Explorer
+          <HelpCircle className="w-3.5 h-3.5 text-emerald-600" />
+          <span>Approved Schema Explorer</span>
         </button>
       </div>
 
       {/* Tab 1: Presets */}
       {activeTab === 'presets' && (
-        <div className="border border-slate-800 rounded-2xl bg-slate-900/30 p-6 space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div className="border border-slate-200 rounded-2xl bg-white p-6 space-y-4 shadow-xs">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
             {presets.map(p => (
               <div
                 key={p.id}
                 onClick={() => setSelectedPreset(p.id)}
                 className={`p-4 rounded-xl border cursor-pointer transition-all ${
                   selectedPreset === p.id
-                    ? 'border-emerald-500/50 bg-emerald-500/10 text-white'
-                    : 'border-slate-800 bg-slate-950/60 text-slate-300 hover:border-slate-700'
+                    ? 'border-emerald-600 bg-emerald-50/70 shadow-2xs'
+                    : 'border-slate-200 bg-white hover:border-slate-300'
                 }`}
               >
                 <div className="flex items-center justify-between">
-                  <h4 className="font-semibold text-xs text-white">{p.name}</h4>
-                  {selectedPreset === p.id && <CheckCircle2 className="w-4 h-4 text-emerald-400" />}
+                  <h4 className="font-bold text-xs text-black">{p.name}</h4>
+                  {selectedPreset === p.id && <CheckCircle2 className="w-4 h-4 text-emerald-600" />}
                 </div>
-                <p className="text-[11px] text-slate-400 mt-1">{p.description}</p>
+                <p className="text-[11px] text-slate-600 mt-1.5 font-medium leading-relaxed">{p.description}</p>
               </div>
             ))}
           </div>
@@ -152,7 +154,7 @@ export default function SQLAnalyticsView() {
             <button
               onClick={handleRunPreset}
               disabled={loading}
-              className="flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs transition-all disabled:opacity-50"
+              className="flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs transition-all shadow-sm disabled:opacity-50 cursor-pointer"
             >
               <Play className="w-3.5 h-3.5 fill-current" />
               <span>{loading ? 'Executing Query...' : 'Run Analytical Query'}</span>
@@ -163,32 +165,32 @@ export default function SQLAnalyticsView() {
 
       {/* Tab 2: Custom SQL */}
       {activeTab === 'custom' && (
-        <div className="border border-slate-800 rounded-2xl bg-slate-900/30 p-6 space-y-4">
-          <div className="p-3 rounded-xl bg-slate-950 border border-amber-500/30 text-amber-300 text-xs flex items-start gap-2">
-            <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+        <div className="border border-slate-200 rounded-2xl bg-white p-6 space-y-4 shadow-xs">
+          <div className="p-3.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-xs flex items-start gap-2.5 shadow-2xs">
+            <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
             <div>
-              <p className="font-semibold">Security Enforcement Active</p>
-              <p className="text-amber-400/80 mt-0.5">
+              <p className="font-bold">Security Enforcement Active</p>
+              <p className="text-amber-800 mt-0.5 font-medium leading-relaxed">
                 Only single-statement read-only <code>SELECT</code> queries against approved tables (<code>customers</code>, <code>products</code>, <code>orders</code>, <code>order_items</code>) are allowed. Destructive statements (<code>DROP</code>, <code>UPDATE</code>, <code>DELETE</code>, <code>INSERT</code>) and schema traversal are strictly rejected by the AST parser.
               </p>
             </div>
           </div>
 
-          <div className="space-y-2">
-            <label className="text-xs font-medium text-slate-400">SQL Query</label>
+          <div className="space-y-1.5">
+            <label className="text-xs font-bold text-black">SQL Query Editor</label>
             <textarea
               rows={4}
               value={customSQL}
               onChange={e => setCustomSQL(e.target.value)}
               placeholder="SELECT c.name, COUNT(o.id) as total_orders, SUM(o.total_amount) as total_spent FROM customers c JOIN orders o ON c.id = o.customer_id GROUP BY c.id, c.name ORDER BY total_spent DESC;"
-              className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs font-mono text-emerald-400 focus:outline-none focus:border-emerald-500 transition-colors"
+              className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3.5 text-xs font-mono font-medium text-black focus:bg-white focus:outline-none focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600 transition-all shadow-2xs"
             />
           </div>
 
-          <div className="flex justify-end gap-2">
+          <div className="flex justify-end gap-2.5">
             <button
               onClick={() => setCustomSQL("SELECT * FROM customers; DROP TABLE orders;")}
-              className="px-3 py-1.5 rounded-lg border border-rose-500/30 text-rose-400 hover:bg-rose-500/10 text-xs transition-colors"
+              className="px-3.5 py-2 rounded-xl border border-rose-200 bg-rose-50 text-rose-800 hover:bg-rose-100 text-xs font-bold transition-colors cursor-pointer"
               title="Test the AST rejection of chained destructive queries"
             >
               Test Attack Query
@@ -196,7 +198,7 @@ export default function SQLAnalyticsView() {
             <button
               onClick={handleRunCustom}
               disabled={loading || !customSQL.trim()}
-              className="flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs transition-all disabled:opacity-50"
+              className="flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs transition-all shadow-sm disabled:opacity-50 cursor-pointer"
             >
               <Play className="w-3.5 h-3.5 fill-current" />
               <span>{loading ? 'Validating & Executing...' : 'Execute SQL'}</span>
@@ -207,20 +209,20 @@ export default function SQLAnalyticsView() {
 
       {/* Tab 3: Schema Inspector */}
       {activeTab === 'schema' && schema && (
-        <div className="border border-slate-800 rounded-2xl bg-slate-900/30 p-6 space-y-4">
+        <div className="border border-slate-200 rounded-2xl bg-white p-6 space-y-4 shadow-xs">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {schema.allowed_tables.map((tbl, i) => (
-              <div key={i} className="p-4 rounded-xl border border-slate-800 bg-slate-950 space-y-2 text-xs">
-                <div className="flex items-center gap-2 text-white font-semibold">
-                  <TableIcon className="w-4 h-4 text-emerald-400" />
-                  <span className="font-mono">{tbl.table_name}</span>
+              <div key={i} className="p-4 rounded-xl border border-slate-200 bg-slate-50/60 space-y-2 text-xs shadow-2xs">
+                <div className="flex items-center gap-2 text-black font-bold">
+                  <TableIcon className="w-4 h-4 text-emerald-600" />
+                  <span className="font-mono text-sm">{tbl.table_name}</span>
                 </div>
-                <p className="text-[11px] text-slate-400">{tbl.description}</p>
-                <div className="pt-2 border-t border-slate-800/80">
-                  <span className="text-[10px] text-slate-500 font-medium uppercase tracking-wider">Columns</span>
-                  <ul className="mt-1 space-y-0.5 text-slate-300 font-mono text-[11px]">
+                <p className="text-[11px] text-slate-600 font-medium">{tbl.description}</p>
+                <div className="pt-2 border-t border-slate-200">
+                  <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Columns</span>
+                  <ul className="mt-1.5 space-y-0.5 text-black font-mono text-[11px] font-medium">
                     {tbl.columns.map((col, cIdx) => (
-                      <li key={cIdx} className="text-slate-400">• {col}</li>
+                      <li key={cIdx} className="text-slate-700">• {col}</li>
                     ))}
                   </ul>
                 </div>
@@ -232,50 +234,50 @@ export default function SQLAnalyticsView() {
 
       {/* Error Output */}
       {error && (
-        <div className="p-4 rounded-xl border border-rose-500/30 bg-rose-500/10 text-rose-300 text-xs flex items-start gap-2.5">
-          <AlertTriangle className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />
+        <div className="p-4 rounded-xl border border-rose-200 bg-rose-50 text-rose-900 text-xs flex items-start gap-2.5 shadow-xs">
+          <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
           <div>
-            <p className="font-semibold">Security Guardrail Violation / Error</p>
-            <p className="text-rose-400/90 mt-0.5 font-mono">{error}</p>
+            <p className="font-bold">Security Guardrail Violation / Error</p>
+            <p className="text-rose-700 mt-0.5 font-mono font-medium">{error}</p>
           </div>
         </div>
       )}
 
       {/* Query Results Table */}
       {result && (
-        <div className="border border-slate-800 rounded-2xl bg-slate-900/40 overflow-hidden space-y-0">
-          <div className="p-4 border-b border-slate-800 flex items-center justify-between text-xs text-slate-400">
-            <span className="flex items-center gap-1.5 font-semibold text-white">
-              <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+        <div className="border border-slate-200 rounded-2xl bg-white overflow-hidden space-y-0 shadow-xs">
+          <div className="p-4 border-b border-slate-200 flex items-center justify-between text-xs text-slate-700 bg-slate-50/70">
+            <span className="flex items-center gap-1.5 font-bold text-black">
+              <CheckCircle2 className="w-4 h-4 text-emerald-600" />
               Query Result ({result.row_count} rows)
             </span>
             <div className="flex items-center gap-3">
-              <span className="flex items-center gap-1 text-slate-500">
+              <span className="flex items-center gap-1 text-slate-600 font-medium">
                 <Clock className="w-3.5 h-3.5" /> Latency: {result.execution_time_ms}ms
               </span>
             </div>
           </div>
 
-          <div className="p-3 bg-slate-950/80 border-b border-slate-800 text-[11px] font-mono text-slate-400 overflow-x-auto">
-            <span className="text-slate-600">Executed SQL: </span>
-            <span className="text-emerald-400">{result.executed_sql}</span>
+          <div className="p-3 bg-slate-50 border-b border-slate-200 text-[11px] font-mono text-slate-700 overflow-x-auto">
+            <span className="text-slate-500 font-semibold">Executed SQL: </span>
+            <span className="text-emerald-800 font-bold">{result.executed_sql}</span>
           </div>
 
           <div className="overflow-x-auto max-h-96">
             <table className="w-full text-left text-xs border-collapse">
               <thead>
-                <tr className="border-b border-slate-800 bg-slate-900/80 text-slate-400 font-semibold font-mono">
+                <tr className="border-b border-slate-200 bg-slate-50 text-slate-700 font-bold font-mono">
                   {result.columns.map((col, i) => (
                     <th key={i} className="py-2.5 px-4">{col}</th>
                   ))}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-800/60 text-slate-300">
+              <tbody className="divide-y divide-slate-100 text-black">
                 {result.rows.map((row, rIdx) => (
-                  <tr key={rIdx} className="hover:bg-slate-800/30 transition-colors">
+                  <tr key={rIdx} className="hover:bg-slate-50/80 transition-colors">
                     {row.map((cell, cIdx) => (
-                      <td key={cIdx} className="py-2.5 px-4 font-mono">
-                        {cell === null ? <span className="text-slate-600">NULL</span> : String(cell)}
+                      <td key={cIdx} className="py-2.5 px-4 font-mono font-medium">
+                        {cell === null ? <span className="text-slate-400">NULL</span> : String(cell)}
                       </td>
                     ))}
                   </tr>

@@ -123,3 +123,4 @@ cd frontend && npm run build
 
 - **PDF Ingestion:** File magic byte inspection (`%PDF-`), 15MB size limit, SHA-256 hash deduplication.
 - **SQL Analytics:** The agent interacts with business data solely through the `analytics_reader` role, restricted strictly to `SELECT` on authorized business tables (`customers`, `orders`, `order_items`, `products`). Any DDL, DML, or application metadata queries are blocked by both AST parsing and the database engine.
+

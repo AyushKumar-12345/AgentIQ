@@ -88,3 +88,4 @@ Never trust an LLM prompt to restrict SQL execution. AgentIQ implements 5 defens
 
 ### Q4: How does LangGraph improve over traditional agent frameworks?
 > **Answer:** *"Traditional agent loops are often black boxes with unpredictable looping behavior. LangGraph models the agent as a directed StateGraph with explicit state definitions, deterministic transition conditions, and hard execution bounds. We enforce a maximum step limit ($N=4$), guaranteeing that the agent cannot recurse infinitely or exhaust API budgets."*
+

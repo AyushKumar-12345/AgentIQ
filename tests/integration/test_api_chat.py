@@ -66,3 +66,4 @@ def test_chat_session_lifecycle(client, make_sample_pdf):
     # Delete session
     del_res = client.delete(f"/api/v1/chat/sessions/{session_id}")
     assert del_res.status_code == status.HTTP_200_OK
+

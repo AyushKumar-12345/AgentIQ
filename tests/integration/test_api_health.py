@@ -23,3 +23,4 @@ def test_health_check_endpoint(client):
     assert "database" in data
     assert "details" in data
     assert data["details"]["llm_provider"] == "mock"
+

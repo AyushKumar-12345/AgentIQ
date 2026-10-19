@@ -114,3 +114,4 @@ if __name__ == "__main__":
     Base.metadata.create_all(bind=engine)
     with SessionLocal() as session:
         seed_business_data(session)
+

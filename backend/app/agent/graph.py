@@ -199,3 +199,4 @@ def create_agent_graph(db: Session, analytics_db: Session):
     builder.add_edge("synthesizer", END)
 
     return builder.compile()
+

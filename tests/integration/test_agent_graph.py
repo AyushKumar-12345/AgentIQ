@@ -56,3 +56,4 @@ def test_agent_hybrid_query(client, db_session, make_sample_pdf):
     tool_names = [t["tool_name"] for t in data["tool_activity"]]
     assert "document_search" in tool_names
     assert "safe_sql_analytics" in tool_names
+

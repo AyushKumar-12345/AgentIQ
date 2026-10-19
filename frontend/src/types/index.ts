@@ -93,3 +93,4 @@ export interface SchemaMetadata {
   allowed_tables: AllowedTableSchema[];
   security_rules: string[];
 }
+

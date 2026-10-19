@@ -36,3 +36,4 @@ def test_chunker_recursive_splitting_and_overlap():
 def test_chunker_invalid_overlap():
     with pytest.raises(ValueError, match="chunk_overlap must be strictly less than chunk_size"):
         RecursiveCharacterChunker(chunk_size=100, chunk_overlap=100)
+

@@ -77,3 +77,4 @@ class OpenAIProvider(BaseLLMProvider, BaseEmbeddingProvider):
                 return [item["embedding"] for item in data["data"]]
         except Exception as e:
             raise AgentIQException(f"OpenAI Embedding API call failed: {str(e)}")
+

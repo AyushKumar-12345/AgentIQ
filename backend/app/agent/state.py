@@ -26,3 +26,4 @@ class AgentState(TypedDict):
     # Output
     final_answer: Optional[str]
     error_message: Optional[str]
+

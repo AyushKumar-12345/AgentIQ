@@ -23,3 +23,4 @@ class PresetQueryInfo(BaseModel):
     name: str
     description: str
     allowed_params: List[str]
+

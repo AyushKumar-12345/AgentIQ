@@ -59,3 +59,4 @@ def check_db_health() -> bool:
     except Exception as exc:
         logger.error(f"Database health check failed: {exc}")
         return False
+

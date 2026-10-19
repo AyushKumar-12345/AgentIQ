@@ -36,3 +36,4 @@ class SQLSecurityViolationError(AgentIQException):
 class AgentExecutionError(AgentIQException):
     """Raised when the LangGraph agent workflow fails or exceeds bounds."""
     pass
+

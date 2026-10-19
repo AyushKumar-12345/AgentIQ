@@ -120,3 +120,4 @@ def reindex_document(
         status=doc.status,
         message="Document re-indexed successfully.",
     )
+

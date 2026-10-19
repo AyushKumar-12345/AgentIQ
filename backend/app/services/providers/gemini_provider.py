@@ -70,3 +70,4 @@ class GeminiProvider(BaseLLMProvider, BaseEmbeddingProvider):
                 return [entry["values"] for entry in data["embeddings"]]
         except Exception as e:
             raise AgentIQException(f"Gemini Embedding API call failed: {str(e)}")
+

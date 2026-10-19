@@ -47,3 +47,4 @@ def execute_sql_analytics(db: Session, tool_input: SQLAnalyticsToolInput) -> Dic
             "error": str(exc),
             "summary": f"SQL tool rejected or failed: {str(exc)}",
         }
+

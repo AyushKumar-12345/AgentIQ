@@ -23,3 +23,4 @@ export async function listPresets(): Promise<PresetQuery[]> {
 export async function getSchema(): Promise<SchemaMetadata> {
   return request('/analytics/schema');
 }
+

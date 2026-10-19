@@ -94,3 +94,4 @@ def test_reindex_document(client, make_sample_pdf):
     reindex_res = client.post(f"/api/v1/documents/{doc_id}/reindex")
     assert reindex_res.status_code == status.HTTP_200_OK
     assert reindex_res.json()["status"] == "INDEXED"
+

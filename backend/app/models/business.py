@@ -78,3 +78,4 @@ class OrderItem(Base):
     __table_args__ = (
         CheckConstraint("quantity > 0", name="chk_order_item_quantity"),
     )
+

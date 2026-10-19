@@ -30,3 +30,4 @@ export async function reindexDocument(id: string): Promise<{ id: string; status:
     method: 'POST',
   });
 }
+

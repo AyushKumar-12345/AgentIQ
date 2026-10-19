@@ -56,3 +56,4 @@ class PDFExtractor:
         except Exception as exc:
             logger.error(f"PDF extraction failed: {str(exc)}")
             raise DocumentProcessingError(f"Corrupted or malformed PDF file: {str(exc)}")
+

@@ -89,3 +89,4 @@ Measures 100% adherence to read-only analytical query policies across DDL, DML, 
    - While the SQL tool supports dynamic read-only SELECT queries through `sqlglot` AST validation, parameterized preset queries (`revenue_by_region`, `top_selling_products`) provide 100% deterministic security against unintended query structures or performance regressions.
 3. **Chunking Boundary Trade-off:**
    - Recursive character chunking with 500 characters and 100-character overlap preserves local sentence context while ensuring compact prompts that fit within conservative token budgets. Documents with tables or complex multi-column layouts benefit from structured table extraction parsers.
+

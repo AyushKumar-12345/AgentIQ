@@ -32,3 +32,4 @@ def get_health() -> HealthCheckResponse:
             "chunk_overlap": settings.CHUNK_OVERLAP,
         },
     )
+

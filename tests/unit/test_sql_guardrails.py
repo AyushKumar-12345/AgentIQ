@@ -74,3 +74,4 @@ def test_enforce_limit_clamping():
     q2 = "SELECT * FROM products LIMIT 5000"
     sanitized2 = SQLToolService.validate_and_sanitize_sql(q2)
     assert "limit 50" in sanitized2.lower()
+

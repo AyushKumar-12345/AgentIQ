@@ -52,3 +52,4 @@ class ChatSessionResponse(BaseModel):
     created_at: datetime
     updated_at: datetime
     messages: Optional[List[ChatMessageResponse]] = None
+

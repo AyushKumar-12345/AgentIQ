@@ -37,3 +37,4 @@ class BaseEmbeddingProvider(ABC):
     def embed_batch(self, texts: List[str]) -> List[List[float]]:
         """Generates embedding vectors for a batch of strings."""
         pass
+

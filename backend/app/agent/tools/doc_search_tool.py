@@ -63,3 +63,4 @@ def execute_doc_search(db: Session, tool_input: DocSearchToolInput) -> Dict[str,
             "error": str(exc),
             "summary": f"Document search failed: {str(exc)}",
         }
+

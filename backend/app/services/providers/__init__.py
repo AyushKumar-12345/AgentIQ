@@ -31,3 +31,4 @@ def get_embedding_provider() -> BaseEmbeddingProvider:
         return MockEmbeddingProvider(dimension=settings.EMBEDDING_DIMENSION)
     else:
         raise ValueError(f"Unsupported embedding provider: {provider_type}")
+
