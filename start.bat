@@ -7,7 +7,7 @@ echo.
 
 :: 1. Launch Backend Server in a new window
 echo [1/3] Launching FastAPI Backend on http://localhost:8000 ...
-start "AgentIQ Backend (Port 8000)" cmd /k "cd /d %~dp0 && set PYTHONPATH=backend && .\.venv\Scripts\python.exe -m uvicorn app.main:app --app-dir backend --reload --port 8000"
+start "AgentIQ Backend (Port 8000)" cmd /k "cd /d %~dp0 && .\.venv\Scripts\python.exe run_backend.py"
 
 :: Wait 2 seconds for backend initialization
 timeout /t 2 /nobreak >nul
