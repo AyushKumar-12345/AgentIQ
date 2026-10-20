@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-10-20T05:56:15Z",
+  "timestamp": "2026-10-20T12:22:16Z",
   "dataset_version": "1.0.0",
   "metrics": {
     "retrieval_recall_at_1": 1.0,
@@ -22,7 +22,7 @@
         "question": "What was the total recurring enterprise revenue in fiscal year 2026?",
         "expected_supported": true,
         "actual_sufficient": true,
-        "latency_ms": 4,
+        "latency_ms": 2,
         "citation_match": true
       },
       {
@@ -30,7 +30,7 @@
         "question": "What operating margin did the company achieve in 2026?",
         "expected_supported": true,
         "actual_sufficient": true,
-        "latency_ms": 1,
+        "latency_ms": 2,
         "citation_match": true
       },
       {
@@ -38,7 +38,7 @@
         "question": "Which compliance and security certifications did the platform complete?",
         "expected_supported": true,
         "actual_sufficient": true,
-        "latency_ms": 1,
+        "latency_ms": 2,
         "citation_match": true
       },
       {
@@ -46,7 +46,7 @@
         "question": "What percentage of new client acquisitions came from international expansion?",
         "expected_supported": true,
         "actual_sufficient": true,
-        "latency_ms": 1,
+        "latency_ms": 2,
         "citation_match": true
       },
       {
@@ -78,7 +78,7 @@
         "question": "What are the quantum computing encryption specs for Mars orbital stations?",
         "expected_supported": false,
         "actual_sufficient": false,
-        "latency_ms": 2,
+        "latency_ms": 1,
         "correct_refusal": true
       },
       {

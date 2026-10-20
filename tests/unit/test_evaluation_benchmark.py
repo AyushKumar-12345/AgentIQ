@@ -16,3 +16,4 @@ def test_benchmark_evaluation_suite():
     assert metrics["hallucination_refusal_rate"] == 1.0
     assert metrics["sql_guardrail_accuracy"] == 1.0
     assert metrics["mean_latency_ms"] < 100.0
+
