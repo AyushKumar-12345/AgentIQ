@@ -1,7 +1,10 @@
 /** Centralized HTTP API client with structured error handling. */
 
-const API_HOST = (import.meta as any).env?.VITE_API_BASE_URL || '';
-export const BASE_URL = API_HOST ? `${API_HOST}/api/v1` : '/api/v1';
+let rawHost = (import.meta as any).env?.VITE_API_BASE_URL || '';
+if (rawHost && !rawHost.startsWith('http://') && !rawHost.startsWith('https://')) {
+  rawHost = `https://${rawHost}`;
+}
+export const BASE_URL = rawHost ? `${rawHost}/api/v1` : '/api/v1';
 
 export class ApiError extends Error {
   public status: number;
