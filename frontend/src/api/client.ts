@@ -1,8 +1,14 @@
 /** Centralized HTTP API client with structured error handling. */
 
 let rawHost = (import.meta as any).env?.VITE_API_BASE_URL || '';
-if (rawHost && !rawHost.startsWith('http://') && !rawHost.startsWith('https://')) {
-  rawHost = `https://${rawHost}`;
+if (rawHost) {
+  // If Render injected internal service name without domain, append .onrender.com
+  if (!rawHost.includes('.')) {
+    rawHost = `${rawHost}.onrender.com`;
+  }
+  if (!rawHost.startsWith('http://') && !rawHost.startsWith('https://')) {
+    rawHost = `https://${rawHost}`;
+  }
 }
 export const BASE_URL = rawHost ? `${rawHost}/api/v1` : '/api/v1';
 
