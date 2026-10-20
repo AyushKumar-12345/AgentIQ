@@ -1,6 +1,7 @@
 /** Centralized HTTP API client with structured error handling. */
 
-const BASE_URL = '/api/v1';
+const API_HOST = (import.meta as any).env?.VITE_API_BASE_URL || '';
+export const BASE_URL = API_HOST ? `${API_HOST}/api/v1` : '/api/v1';
 
 export class ApiError extends Error {
   public status: number;

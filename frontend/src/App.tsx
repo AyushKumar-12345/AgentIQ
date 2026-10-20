@@ -16,6 +16,7 @@ import DocumentVault from './components/documents/DocumentVault';
 import AgenticChat from './components/chat/AgenticChat';
 import SQLAnalyticsView from './components/analytics/SQLAnalyticsView';
 import { listSessions } from './api/chat';
+import { BASE_URL } from './api/client';
 
 export default function App() {
   const [health, setHealth] = useState<HealthData | null>(null);
@@ -32,7 +33,7 @@ export default function App() {
   const fetchHealth = async () => {
     try {
       setLoadingHealth(true);
-      const res = await fetch('/api/v1/health');
+      const res = await fetch(`${BASE_URL}/health`);
       if (!res.ok) {
         throw new Error(`HTTP ${res.status}: Failed to reach backend API`);
       }
