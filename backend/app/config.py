@@ -53,7 +53,7 @@ class Settings(BaseSettings):
 
     # RAG Retrieval Defaults
     DEFAULT_TOP_K: int = 4
-    DEFAULT_SIMILARITY_THRESHOLD: float = 0.65
+    DEFAULT_SIMILARITY_THRESHOLD: float = 0.45
 
     # LangGraph Agent Constraints
     AGENT_MAX_STEPS: int = 4

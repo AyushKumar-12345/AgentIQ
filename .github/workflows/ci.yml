@@ -55,6 +55,14 @@ jobs:
         run: |
           pytest -v
 
+      - name: Run Benchmark Evaluation Runner
+        env:
+          DATABASE_URL: postgresql+psycopg://agentiq_user:agentiq_password@localhost:5432/agentiq_db
+          ANALYTICS_DATABASE_URL: postgresql+psycopg://agentiq_user:agentiq_password@localhost:5432/agentiq_db
+          PYTHONPATH: backend
+        run: |
+          python backend/app/evaluation/runner.py
+
   frontend-checks:
     name: Frontend Tests, Type Check & Production Build
     runs-on: ubuntu-latest

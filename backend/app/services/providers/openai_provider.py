@@ -55,8 +55,33 @@ class OpenAIProvider(BaseLLMProvider, BaseEmbeddingProvider):
                 res.raise_for_status()
                 data = res.json()
                 return data["choices"][0]["message"]["content"]
+        except httpx.HTTPStatusError as exc:
+            status_code = exc.response.status_code
+            if status_code in (401, 403):
+                raise AgentIQException(
+                    f"OpenAI Authentication failed ({status_code}): Invalid or inactive API key. "
+                    "Please check OPENAI_API_KEY in your .env file."
+                ) from exc
+            elif status_code == 429:
+                raise AgentIQException(
+                    f"OpenAI Quota/Rate Limit exceeded ({status_code}): Check your OpenAI account balance or limits."
+                ) from exc
+            elif status_code >= 500:
+                raise AgentIQException(
+                    f"OpenAI service error ({status_code}): The OpenAI service is temporarily unavailable."
+                ) from exc
+            else:
+                try:
+                    err_msg = exc.response.json().get("error", {}).get("message", exc.response.text)
+                except Exception:
+                    err_msg = exc.response.text
+                raise AgentIQException(f"OpenAI API error ({status_code}): {err_msg}") from exc
+        except httpx.TimeoutException as exc:
+            raise AgentIQException(f"OpenAI request timed out after {self.timeout}s.") from exc
+        except httpx.RequestError as exc:
+            raise AgentIQException(f"OpenAI network connection failed: {str(exc)}") from exc
         except Exception as e:
-            raise AgentIQException(f"OpenAI API call failed: {str(e)}")
+            raise AgentIQException(f"OpenAI API call failed: {str(e)}") from e
 
     def embed_text(self, text: str) -> List[float]:
         return self.embed_batch([text])[0]
@@ -77,6 +102,23 @@ class OpenAIProvider(BaseLLMProvider, BaseEmbeddingProvider):
                 res.raise_for_status()
                 data = res.json()
                 return [item["embedding"] for item in data["data"]]
+        except httpx.HTTPStatusError as exc:
+            status_code = exc.response.status_code
+            if status_code in (401, 403):
+                raise AgentIQException(
+                    f"OpenAI Authentication failed ({status_code}): Invalid or inactive API key. "
+                    "Please check OPENAI_API_KEY in your .env file."
+                ) from exc
+            elif status_code == 429:
+                raise AgentIQException(
+                    f"OpenAI Quota/Rate Limit exceeded ({status_code}): Check your OpenAI account balance or limits."
+                ) from exc
+            else:
+                raise AgentIQException(f"OpenAI Embedding API error ({status_code}): {exc.response.text}") from exc
+        except httpx.TimeoutException as exc:
+            raise AgentIQException(f"OpenAI embedding request timed out after {self.timeout}s.") from exc
+        except httpx.RequestError as exc:
+            raise AgentIQException(f"OpenAI network connection failed: {str(exc)}") from exc
         except Exception as e:
-            raise AgentIQException(f"OpenAI Embedding API call failed: {str(e)}")
+            raise AgentIQException(f"OpenAI Embedding API call failed: {str(e)}") from e
 

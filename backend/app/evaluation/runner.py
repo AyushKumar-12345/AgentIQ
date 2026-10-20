@@ -79,7 +79,7 @@ def run_evaluation() -> Dict[str, Any]:
         req = RAGQueryRequest(
             question=test_case["question"],
             top_k=3,
-            similarity_threshold=0.25,
+            similarity_threshold=0.20,
         )
         res = RAGService.query_rag(db=session, request=req)
         rag_latencies.append(res.latency_ms)

@@ -77,3 +77,27 @@ def test_provider_factory_invalid(monkeypatch):
     monkeypatch.setattr(settings, "LLM_PROVIDER", "unsupported_llm_xyz")
     with pytest.raises(ValueError):
         get_llm_provider()
+
+
+def test_mock_llm_sql_synthesis():
+    """Verifies mock LLM synthesizes SQL database results."""
+    provider = MockLLMProvider()
+    prompt = "QUESTION: Show revenue\n<database_results>\nColumns: ['region', 'rev']\nRows: [['EMEA', 50000]]\n</database_results>"
+    res = provider.generate(prompt)
+    assert "Database analytics records indicate:" in res
+    assert "region: EMEA" in res
+    assert "rev: 50000" in res
+
+
+def test_mock_llm_hybrid_synthesis():
+    """Verifies mock LLM synthesizes both documents and database results."""
+    provider = MockLLMProvider()
+    prompt = (
+        "QUESTION: Compare target\n"
+        "<document_context>\n[Doc: target.pdf | Page: 1]\nSoftware target is 100k.\n</document_context>\n\n"
+        "<database_results>\nColumns: ['product', 'sales']\nRows: [['Enterprise Suite', 95000]]\n</database_results>"
+    )
+    res = provider.generate(prompt)
+    assert "[Doc: target.pdf, Page: 1]" in res
+    assert "Database analytics records indicate:" in res
+

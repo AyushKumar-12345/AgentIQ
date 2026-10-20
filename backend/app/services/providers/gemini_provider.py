@@ -32,7 +32,11 @@ class GeminiProvider(BaseLLMProvider, BaseEmbeddingProvider):
         temperature: float = 0.0,
         max_tokens: int = 1000,
     ) -> str:
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/{self.chat_model}:generateContent?key={self.api_key}"
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/{self.chat_model}:generateContent"
+        headers = {
+            "x-goog-api-key": self.api_key,
+            "Content-Type": "application/json",
+        }
         
         contents = []
         if system_prompt:
@@ -49,27 +53,72 @@ class GeminiProvider(BaseLLMProvider, BaseEmbeddingProvider):
 
         try:
             with httpx.Client(timeout=self.timeout) as client:
-                res = client.post(url, json=payload)
+                res = client.post(url, headers=headers, json=payload)
                 res.raise_for_status()
                 data = res.json()
                 return data["candidates"][0]["content"]["parts"][0]["text"]
+        except httpx.HTTPStatusError as exc:
+            status_code = exc.response.status_code
+            if status_code in (401, 403):
+                raise AgentIQException(
+                    f"Google Gemini Authentication failed ({status_code}): Invalid or inactive API key. "
+                    "Please check GEMINI_API_KEY in your .env file."
+                ) from exc
+            elif status_code == 429:
+                raise AgentIQException(
+                    f"Google Gemini Quota/Rate Limit exceeded ({status_code}): Check your Google AI Studio quota."
+                ) from exc
+            elif status_code >= 500:
+                raise AgentIQException(
+                    f"Google Gemini service error ({status_code}): Service temporarily unavailable."
+                ) from exc
+            else:
+                try:
+                    err_msg = exc.response.json().get("error", {}).get("message", exc.response.text)
+                except Exception:
+                    err_msg = exc.response.text
+                raise AgentIQException(f"Google Gemini API error ({status_code}): {err_msg}") from exc
+        except httpx.TimeoutException as exc:
+            raise AgentIQException(f"Google Gemini request timed out after {self.timeout}s.") from exc
+        except httpx.RequestError as exc:
+            raise AgentIQException(f"Google Gemini network connection failed: {str(exc)}") from exc
         except Exception as e:
-            raise AgentIQException(f"Gemini API call failed: {str(e)}")
+            raise AgentIQException(f"Gemini API call failed: {str(e)}") from e
 
     def embed_text(self, text: str) -> List[float]:
         return self.embed_batch([text])[0]
 
     def embed_batch(self, texts: List[str]) -> List[List[float]]:
-        url = f"https://generativelanguage.googleapis.com/v1beta/{self.embedding_model}:batchEmbedContents?key={self.api_key}"
+        url = f"https://generativelanguage.googleapis.com/v1beta/{self.embedding_model}:batchEmbedContents"
+        headers = {
+            "x-goog-api-key": self.api_key,
+            "Content-Type": "application/json",
+        }
         requests = [{"model": self.embedding_model, "content": {"parts": [{"text": t}]}} for t in texts]
 
         payload = {"requests": requests}
         try:
             with httpx.Client(timeout=self.timeout) as client:
-                res = client.post(url, json=payload)
+                res = client.post(url, headers=headers, json=payload)
                 res.raise_for_status()
                 data = res.json()
                 return [entry["values"] for entry in data["embeddings"]]
+        except httpx.HTTPStatusError as exc:
+            status_code = exc.response.status_code
+            if status_code in (401, 403):
+                raise AgentIQException(
+                    f"Google Gemini Authentication failed ({status_code}): Invalid API key for embeddings."
+                ) from exc
+            elif status_code == 429:
+                raise AgentIQException(
+                    f"Google Gemini Quota exceeded ({status_code}) for embeddings."
+                ) from exc
+            else:
+                raise AgentIQException(f"Google Gemini Embedding API error ({status_code}): {exc.response.text}") from exc
+        except httpx.TimeoutException as exc:
+            raise AgentIQException(f"Google Gemini embedding request timed out after {self.timeout}s.") from exc
+        except httpx.RequestError as exc:
+            raise AgentIQException(f"Google Gemini network connection failed: {str(exc)}") from exc
         except Exception as e:
-            raise AgentIQException(f"Gemini Embedding API call failed: {str(e)}")
+            raise AgentIQException(f"Gemini Embedding API call failed: {str(e)}") from e
 

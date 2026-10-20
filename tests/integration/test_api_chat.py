@@ -67,3 +67,21 @@ def test_chat_session_lifecycle(client, make_sample_pdf):
     del_res = client.delete(f"/api/v1/chat/sessions/{session_id}")
     assert del_res.status_code == status.HTTP_200_OK
 
+
+def test_agent_session_persistence_with_tool_activity(client, db_session):
+    """Verifies that an agent session preserves tool_activity in past conversation messages."""
+    agent_res = client.post("/api/v1/chat/agent", json={"message": "What is our customer sales revenue by region?"})
+    assert agent_res.status_code == status.HTTP_200_OK
+    session_id = agent_res.json()["session_id"]
+
+    session_res = client.get(f"/api/v1/chat/sessions/{session_id}")
+    assert session_res.status_code == status.HTTP_200_OK
+    history = session_res.json()
+    assert len(history["messages"]) == 2
+    assistant_msg = history["messages"][1]
+    assert assistant_msg["role"] == "assistant"
+    assert assistant_msg["tool_activity"] is not None
+    assert len(assistant_msg["tool_activity"]) >= 1
+    assert assistant_msg["tool_activity"][0]["tool_name"] == "safe_sql_analytics"
+
+

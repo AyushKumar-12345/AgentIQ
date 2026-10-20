@@ -1,5 +1,6 @@
 """Deterministic, fully offline Mock Provider for testing and local development."""
 
+import ast
 import math
 import re
 from typing import List, Optional
@@ -57,25 +58,84 @@ class MockLLMProvider(BaseLLMProvider):
         prompt_lower = prompt.lower()
 
         # Check for empty context or insufficient evidence indicators
-        if "no relevant document chunks found" in prompt_lower or "<context>\n</context>" in prompt:
+        if (
+            "no relevant document chunks found" in prompt_lower
+            or "<context>\n</context>" in prompt
+            or "<context></context>" in prompt
+        ):
             return "The provided documents do not contain sufficient evidence to answer this question."
 
-        # Extract citation references from the prompt if present
-        # Format in prompt: [Context Document: {filename} | Page: {page} | Chunk ID: {id}]
-        citation_matches = re.findall(
-            r"\[Context Document:\s*([^\|]+?)\s*\|\s*Page:\s*(\d+)\s*\|\s*Chunk ID:\s*([^\]]+?)\]",
-            prompt,
+        # Extract Question if present
+        question_match = re.search(r"QUESTION:\s*(.*?)(?=\n<|\Z)", prompt, re.DOTALL | re.IGNORECASE)
+        question_words = set(re.findall(r"\w{3,}", question_match.group(1).lower())) if question_match else set()
+
+        # Extract document sections
+        # Matches either [Context Document: {name} | Page: {page} ...] or [Doc: {name} | Page: {page}]
+        doc_pattern = re.compile(
+            r"\[(?:Context Document|Doc):\s*([^\|\]]+?)\s*\|\s*Page:\s*(\d+).*?\]\s*\n+([\s\S]*?)(?=(?:\[(?:Context Document|Doc):|</context>|</document_context>|<database_results>|$))",
+            re.MULTILINE,
         )
 
-        if citation_matches:
-            doc_name, page, _ = citation_matches[0]
+        doc_blocks = doc_pattern.findall(prompt)
+        doc_summaries = []
+
+        for doc_name, page_str, content in doc_blocks:
             doc_name = doc_name.strip()
-            page = page.strip()
-            
-            # Grounded synthesis response
-            return (
-                f"Based on the provided documentation, the requested information indicates verified enterprise metrics "
-                f"and operational details [Doc: {doc_name}, Page: {page}]."
+            page = page_str.strip()
+            clean_content = content.strip()
+
+            if not clean_content:
+                continue
+
+            # Pick the most informative sentence matching the question, or first sentence
+            sentences = [s.strip() for s in re.split(r"(?<=[.!?])\s+", clean_content) if len(s.strip()) > 10]
+            best_sentence = None
+            best_score = -1
+
+            for s in sentences:
+                s_words = set(re.findall(r"\w{3,}", s.lower()))
+                overlap = len(s_words & question_words)
+                has_numbers = bool(re.search(r"\d+", s))
+                score = overlap * 2 + (1 if has_numbers else 0)
+                if score > best_score:
+                    best_score = score
+                    best_sentence = s
+
+            evidence_text = best_sentence if best_sentence else (sentences[0] if sentences else clean_content[:200])
+            doc_summaries.append(
+                f"Based on the provided documentation, {evidence_text} [Doc: {doc_name}, Page: {page}]."
             )
 
-        return "Based on the available evidence, the records confirm the requested business information."
+        # Extract Database Results if present
+        db_summary = None
+        db_match = re.search(
+            r"<database_results>\s*Columns:\s*(\[.*?\])\s*Rows:\s*(\[.*?\])\s*</database_results>",
+            prompt,
+            re.DOTALL,
+        )
+        if db_match:
+            try:
+                cols = ast.literal_eval(db_match.group(1))
+                rows = ast.literal_eval(db_match.group(2))
+                if rows:
+                    row_lines = []
+                    for row in rows[:5]:
+                        pairs = [f"{c}: {v}" for c, v in zip(cols, row)]
+                        row_lines.append("- " + ", ".join(pairs))
+                    db_summary = "Database analytics records indicate:\n" + "\n".join(row_lines)
+            except Exception:
+                db_summary = "Database analytics returned relevant business metrics matching the query."
+
+        # Combine synthesis
+        if doc_summaries and db_summary:
+            return "\n\n".join(doc_summaries) + "\n\n" + db_summary
+        elif doc_summaries:
+            return "\n\n".join(doc_summaries)
+        elif db_summary:
+            return db_summary
+
+        if "<database_results>" in prompt and not db_summary:
+            return "Database query completed with no matching records found."
+
+        return "The provided documents do not contain sufficient evidence to answer this question."
+

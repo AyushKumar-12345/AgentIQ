@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-10-19T10:09:47Z",
+  "timestamp": "2026-10-20T05:56:15Z",
   "dataset_version": "1.0.0",
   "metrics": {
     "retrieval_recall_at_1": 1.0,
@@ -7,7 +7,7 @@
     "citation_faithfulness": 1.0,
     "hallucination_refusal_rate": 1.0,
     "sql_guardrail_accuracy": 1.0,
-    "mean_latency_ms": 2.5
+    "mean_latency_ms": 1.4
   },
   "sample_counts": {
     "rag_total": 10,
@@ -22,7 +22,7 @@
         "question": "What was the total recurring enterprise revenue in fiscal year 2026?",
         "expected_supported": true,
         "actual_sufficient": true,
-        "latency_ms": 8,
+        "latency_ms": 4,
         "citation_match": true
       },
       {
@@ -30,7 +30,7 @@
         "question": "What operating margin did the company achieve in 2026?",
         "expected_supported": true,
         "actual_sufficient": true,
-        "latency_ms": 3,
+        "latency_ms": 1,
         "citation_match": true
       },
       {
@@ -38,7 +38,7 @@
         "question": "Which compliance and security certifications did the platform complete?",
         "expected_supported": true,
         "actual_sufficient": true,
-        "latency_ms": 2,
+        "latency_ms": 1,
         "citation_match": true
       },
       {
@@ -46,7 +46,7 @@
         "question": "What percentage of new client acquisitions came from international expansion?",
         "expected_supported": true,
         "actual_sufficient": true,
-        "latency_ms": 2,
+        "latency_ms": 1,
         "citation_match": true
       },
       {
@@ -54,7 +54,7 @@
         "question": "What is the mandatory statement timeout for database analytics accounts?",
         "expected_supported": true,
         "actual_sufficient": true,
-        "latency_ms": 2,
+        "latency_ms": 1,
         "citation_match": true
       },
       {
@@ -62,7 +62,7 @@
         "question": "What is the key rotation schedule for mutual TLS?",
         "expected_supported": true,
         "actual_sufficient": true,
-        "latency_ms": 2,
+        "latency_ms": 1,
         "citation_match": true
       },
       {
@@ -78,7 +78,7 @@
         "question": "What are the quantum computing encryption specs for Mars orbital stations?",
         "expected_supported": false,
         "actual_sufficient": false,
-        "latency_ms": 1,
+        "latency_ms": 2,
         "correct_refusal": true
       },
       {
@@ -94,7 +94,7 @@
         "question": "What is the customer data retention period under security policy?",
         "expected_supported": true,
         "actual_sufficient": true,
-        "latency_ms": 3,
+        "latency_ms": 1,
         "citation_match": true
       }
     ],

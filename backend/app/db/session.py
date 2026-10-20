@@ -6,13 +6,25 @@ from sqlalchemy.orm import declarative_base, sessionmaker, Session
 from app.config import settings
 from app.core.logging import logger
 
+# Helper to normalize PostgreSQL URLs to use psycopg v3 driver if not explicitly specified
+def _normalize_db_url(url: str) -> str:
+    if url.startswith("postgresql://"):
+        return url.replace("postgresql://", "postgresql+psycopg://", 1)
+    if url.startswith("postgres://"):
+        return url.replace("postgres://", "postgresql+psycopg://", 1)
+    return url
+
+
+db_url = _normalize_db_url(settings.DATABASE_URL)
+analytics_url = _normalize_db_url(settings.ANALYTICS_DATABASE_URL)
+
 # Construct database engines
 # Check if running SQLite for dev/test or PostgreSQL for production
-is_sqlite = settings.DATABASE_URL.startswith("sqlite")
+is_sqlite = db_url.startswith("sqlite")
 connect_args = {"check_same_thread": False} if is_sqlite else {}
 
 engine = create_engine(
-    settings.DATABASE_URL,
+    db_url,
     connect_args=connect_args,
     pool_pre_ping=True,
 )
@@ -20,9 +32,9 @@ engine = create_engine(
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 # Analytics engine for read-only SQL tool
-analytics_connect_args = {"check_same_thread": False} if settings.ANALYTICS_DATABASE_URL.startswith("sqlite") else {}
+analytics_connect_args = {"check_same_thread": False} if analytics_url.startswith("sqlite") else {}
 analytics_engine = create_engine(
-    settings.ANALYTICS_DATABASE_URL,
+    analytics_url,
     connect_args=analytics_connect_args,
     pool_pre_ping=True,
 )
