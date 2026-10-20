@@ -1,6 +1,68 @@
-# AgentIQ — Agentic Enterprise Knowledge Assistant
+# 🧠 AgentIQ — Agentic Enterprise Knowledge Platform
 
-AgentIQ is a full-stack, enterprise-grade AI knowledge platform. It enables organizations to ingest business documents, retrieve grounded factual answers with verifiable source citations, and query relational business metrics through safe, bounded agentic workflows powered by LangGraph, PostgreSQL, and pgvector.
+<div align="center">
+
+[![CI Pipeline](https://github.com/AyushKumar-12345/AgentIQ/actions/workflows/ci.yml/badge.svg)](https://github.com/AyushKumar-12345/AgentIQ/actions/workflows/ci.yml)
+[![Python](https://img.shields.io/badge/Python-3.12-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.115-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
+[![LangGraph](https://img.shields.io/badge/LangGraph-StateGraph-1C3C3C?style=for-the-badge&logo=langchain&logoColor=white)](https://langchain-ai.github.io/langgraph/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16%20%2B%20pgvector-336791?style=for-the-badge&logo=postgresql&logoColor=white)](https://github.com/pgvector/pgvector)
+[![React 18](https://img.shields.io/badge/React-18%20(TypeScript)-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev/)
+[![Docker](https://img.shields.io/badge/Docker-Multi--Container-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
+[![Render](https://img.shields.io/badge/Render-Deployed-46E3B7?style=for-the-badge&logo=render&logoColor=black)](https://agentiq-frontend.onrender.com)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](LICENSE)
+
+<br/>
+
+**A full-stack, enterprise-grade AI knowledge platform orchestrating bounded multi-step reasoning, grounded RAG citations, and AST-guarded relational analytics.**  
+*Engineered with LangGraph StateGraph ($N \le 4$), PostgreSQL 16 with pgvector HNSW indexing, 5-layer SQL guardrails with sqlglot, and React 18 + TypeScript.*
+
+<br/>
+
+[🚀 Live Demo](https://agentiq-frontend.onrender.com) • [📦 GitHub Repository](https://github.com/AyushKumar-12345/AgentIQ) • [📑 Swagger API Docs](https://agentiq-backend-k8om.onrender.com/docs) • [🐳 Docker Quickstart](#option-c-containerized-with-docker-compose) • [🧪 Evaluation Suite](#benchmark-evaluation-suite-results)
+
+</div>
+
+---
+
+## 🏗 System Architecture
+
+```mermaid
+flowchart TD
+    Client["Client Workspace\n(React 18 • TypeScript • Tailwind)"]
+
+    subgraph Edge["Ingress & Container Layer"]
+        Nginx["Nginx Reverse Proxy / Static Host\n(Port 80/5173)"]
+        DockerEngine["Docker Multi-Service Network"]
+    end
+
+    subgraph CoreBackend["AgentIQ FastAPI Core (Python 3.12)"]
+        APIRoutes["FastAPI REST Endpoints\n(/api/v1/chat • /documents • /analytics)"]
+        
+        subgraph Orchestration["Agentic Orchestration Engine"]
+            Router["Intent Classifier & Router\n(StateGraph Bounded N <= 4)"]
+            DocAgent["RAG Tool Node\n(Cosine Cutoff 0.45 • Chunk Verification)"]
+            SQLAgent["SQL Analytics Tool\n(AST Validator • Whitelist Table Gate)"]
+            Synthesizer["Evidence Synthesis & Citations Node"]
+        end
+    end
+
+    subgraph DataPersistence["PostgreSQL 16 & pgvector Engine"]
+        PGVector[("PostgreSQL 16 + pgvector\nHNSW Indexing (1536d / 768d)")]
+        RelationalDB[("Enterprise Relational Tables\n(Customers • Orders • Products)")]
+    end
+
+    Client -->|HTTPS / JSON| Nginx
+    Nginx --> APIRoutes
+    APIRoutes --> Router
+    Router -->|Unstructured Docs| DocAgent
+    Router -->|Structured Metrics| SQLAgent
+    DocAgent --> PGVector
+    SQLAgent --> RelationalDB
+    DocAgent --> Synthesizer
+    SQLAgent --> Synthesizer
+    Synthesizer -->|Grounded Answer + Citations| APIRoutes
+```
 
 ---
 
