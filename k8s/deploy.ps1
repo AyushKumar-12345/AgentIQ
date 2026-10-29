@@ -35,3 +35,4 @@ Write-Host "======================================================" -ForegroundC
 Write-Host " AgentIQ Kubernetes Deployment Successfully Rolled Out!" -ForegroundColor Green
 Write-Host "======================================================" -ForegroundColor Green
 kubectl get all -n agentiq
+

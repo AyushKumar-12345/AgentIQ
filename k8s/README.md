@@ -104,3 +104,4 @@ kubectl port-forward svc/agentiq-backend 8000:8000 -n agentiq
 1. **AI Provider Credentials**: Edit `k8s/secret.yaml` with your production `OPENAI_API_KEY` or `GEMINI_API_KEY`, and update `LLM_PROVIDER` in `k8s/configmap.yaml`.
 2. **Custom Domain & TLS**: Update `k8s/ingress.yaml` with your custom hostname and cert-manager `tls:` block.
 3. **Cloud Storage**: In AWS/GCP/Azure, replace `storageClassName` in `k8s/storage-pvc.yaml` and `k8s/postgres.yaml` with `gp3`, `standard-rwo`, or `managed-csi`.
+

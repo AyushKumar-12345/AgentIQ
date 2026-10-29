@@ -24,3 +24,4 @@ data:
   SQL_MAX_ROWS: "50"
   UPLOAD_DIR: "/app/uploads"
   MAX_UPLOAD_SIZE_BYTES: "15728640"
+

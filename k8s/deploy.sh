@@ -38,3 +38,4 @@ echo "======================================================"
 echo " AgentIQ Kubernetes Deployment Successfully Rolled Out!"
 echo "======================================================"
 kubectl get all -n agentiq
+
