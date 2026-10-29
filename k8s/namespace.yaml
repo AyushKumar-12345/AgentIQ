@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: agentiq
+  labels:
+    app.kubernetes.io/name: agentiq
+    app.kubernetes.io/part-of: agentiq-system
+    app.kubernetes.io/managed-by: kustomize

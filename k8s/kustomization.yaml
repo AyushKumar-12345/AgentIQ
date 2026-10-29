@@ -1,0 +1,18 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: agentiq
+
+resources:
+  - namespace.yaml
+  - configmap.yaml
+  - secret.yaml
+  - storage-pvc.yaml
+  - postgres.yaml
+  - backend.yaml
+  - frontend.yaml
+  - ingress.yaml
+
+commonLabels:
+  app.kubernetes.io/part-of: agentiq-system
+  app.kubernetes.io/managed-by: kustomize

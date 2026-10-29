@@ -1,0 +1,135 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: agentiq-postgres-init
+  namespace: agentiq
+  labels:
+    app.kubernetes.io/name: agentiq-postgres-init
+    app.kubernetes.io/part-of: agentiq-system
+data:
+  init.sql: |
+    CREATE EXTENSION IF NOT EXISTS vector;
+    CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
+    DO $$
+    BEGIN
+       IF NOT EXISTS (
+          SELECT FROM pg_catalog.pg_roles WHERE rolname = 'analytics_reader'
+       ) THEN
+          CREATE ROLE analytics_reader WITH LOGIN PASSWORD 'readonly_password';
+       END IF;
+    END
+    $$;
+
+    REVOKE ALL ON SCHEMA public FROM analytics_reader;
+    GRANT CONNECT ON DATABASE agentiq TO analytics_reader;
+    GRANT USAGE ON SCHEMA public TO analytics_reader;
+    ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT ON TABLES TO analytics_reader;
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: agentiq-postgres
+  namespace: agentiq
+  labels:
+    app.kubernetes.io/name: agentiq-postgres
+    app.kubernetes.io/component: database
+    app.kubernetes.io/part-of: agentiq-system
+spec:
+  serviceName: agentiq-postgres
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: agentiq-postgres
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: agentiq-postgres
+        app.kubernetes.io/component: database
+    spec:
+      containers:
+        - name: postgres
+          image: pgvector/pgvector:pg16
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: postgres
+              containerPort: 5432
+          env:
+            - name: POSTGRES_DB
+              valueFrom:
+                secretKeyRef:
+                  name: agentiq-secret
+                  key: POSTGRES_DB
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: agentiq-secret
+                  key: POSTGRES_USER
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: agentiq-secret
+                  key: POSTGRES_PASSWORD
+          resources:
+            requests:
+              cpu: 250m
+              memory: 512Mi
+            limits:
+              cpu: 1000m
+              memory: 2Gi
+          livenessProbe:
+            exec:
+              command:
+                - sh
+                - -c
+                - pg_isready -U $POSTGRES_USER -d $POSTGRES_DB
+            initialDelaySeconds: 15
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 5
+          readinessProbe:
+            exec:
+              command:
+                - sh
+                - -c
+                - pg_isready -U $POSTGRES_USER -d $POSTGRES_DB
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            timeoutSeconds: 5
+            failureThreshold: 3
+          volumeMounts:
+            - name: postgres-data
+              mountPath: /var/lib/postgresql/data
+            - name: postgres-init
+              mountPath: /docker-entrypoint-initdb.d/init.sql
+              subPath: init.sql
+      volumes:
+        - name: postgres-init
+          configMap:
+            name: agentiq-postgres-init
+  volumeClaimTemplates:
+    - metadata:
+        name: postgres-data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 10Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: agentiq-postgres
+  namespace: agentiq
+  labels:
+    app.kubernetes.io/name: agentiq-postgres
+    app.kubernetes.io/component: database
+    app.kubernetes.io/part-of: agentiq-system
+spec:
+  type: ClusterIP
+  ports:
+    - port: 5432
+      targetPort: 5432
+      name: postgres
+  selector:
+    app.kubernetes.io/name: agentiq-postgres
